@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -15,16 +16,12 @@ type User struct {
 	AvatarURL string `json:"avatar_url"`
 }
 
-// Users an array of User
-type Users struct {
-	Users []User
-}
-
 func sayHello(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "message": "Hello there!"})
 }
 
 func fetchTopContributers(c *gin.Context) {
+	start := time.Now()
 	var org = c.Param("org")
 	var repo = c.Param("repo")
 	var users []User
@@ -41,6 +38,8 @@ func fetchTopContributers(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"status": http.StatusInternalServerError, "message": "error while unmarshalling the json"})
 		return
 	}
+	elapsed := time.Since(start)
+	log.Printf("time taken: %s", elapsed)
 	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "data": users})
 	return
 }
